@@ -1,0 +1,52 @@
+#include <DHT.h>
+
+// Definições de pinos
+#define DHT_PIN 4 // Pino de dados do DHT22
+#define RELAY_PIN 5 // Pino de controle do relé (aciona o LED/bomba)
+
+// Tipo do sensor
+#define DHTTYPE DHT22
+
+// Inicializa o sensor DHT
+DHT dht(DHT_PIN, DHTTYPE);
+
+void setup() {
+Serial.begin(115200);
+
+// Inicializa o DHT
+dht.begin();
+
+// Define o pino do relé como saída
+pinMode(RELAY_PIN, OUTPUT);
+
+// Garante que a bomba (LED) começa desligada
+digitalWrite(RELAY_PIN, LOW);
+}
+
+void loop() {
+// Lê a umidade do sensor
+float umidade = dht.readHumidity();
+
+// Verifica se a leitura falhou
+if (isnan(umidade)) {
+Serial.println("Falha na leitura do sensor DHT!");
+delay(2000);
+return;
+}
+
+// Mostra a umidade no monitor serial
+Serial.print("Umidade: ");
+Serial.print(umidade);
+Serial.println(" %");
+
+// Aciona ou desliga a bomba (LED no relé)
+if (umidade < 40.0) {
+digitalWrite(RELAY_PIN, HIGH); // Liga o relé → LED acende
+Serial.println("Bomba LIGADA (LED aceso)");
+} else {
+digitalWrite(RELAY_PIN, LOW); // Desliga o relé → LED apaga
+Serial.println("Bomba DESLIGADA (LED apagado)");
+}
+
+delay(2000); // Aguarda 2 segundos
+}
